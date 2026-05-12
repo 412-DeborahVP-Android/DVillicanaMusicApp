@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.dvillicaamusicapp.data.Album
 import com.example.dvillicaamusicapp.data.RetrofitInstance
+import com.example.dvillicaamusicapp.ui.components.MiniPlayer
 
 @Composable
 fun HomeScreen(
@@ -60,18 +61,22 @@ fun HomeScreen(
         return
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F0FA))
-    ) {
-        item { HomeHeader() }
-        item { AlbumsSection(albums, onAlbumClick) }
-        item { RecentlyPlayedHeader() }
-        items(albums) { album ->
-            RecentlyPlayedItem(album, onAlbumClick)
+    Box(Modifier.fillMaxSize().background(Color(0xFFF5F0FA))) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            item { HomeHeader() }
+            item { AlbumsSection(albums, onAlbumClick) }
+            item { RecentlyPlayedHeader() }
+            items(albums) { album ->
+                RecentlyPlayedItem(album, onAlbumClick)
+            }
+            item { Spacer(Modifier.height(80.dp)) }
         }
-        item { Spacer(Modifier.height(80.dp)) }
+        MiniPlayer(
+            album = albums.firstOrNull(),
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 
