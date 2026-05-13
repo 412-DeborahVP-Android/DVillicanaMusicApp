@@ -102,7 +102,7 @@ private fun HomeHeader() {
                 Spacer(Modifier.height(12.dp))
                 Text("Good Morning!", color = Color.White, fontSize = 14.sp)
                 Text(
-                    "Juan Frausto",
+                    "Deborah Villicaña",
                     color = Color.White,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold

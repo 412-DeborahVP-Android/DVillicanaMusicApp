@@ -1,10 +1,11 @@
 package com.example.dvillicaamusicapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
+import androidx.navigation.navArgument
 import com.example.dvillicaamusicapp.ui.screens.DetailScreen
 import com.example.dvillicaamusicapp.ui.screens.HomeScreen
 
@@ -12,18 +13,21 @@ import com.example.dvillicaamusicapp.ui.screens.HomeScreen
 fun AppNavGraph() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Home) {
-        composable<Home> {
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
             HomeScreen(
                 onAlbumClick = { albumId ->
-                    navController.navigate(Detail(albumId = albumId))
+                    navController.navigate("detail/$albumId")
                 }
             )
         }
-        composable<Detail> { backStackEntry ->
-            val detail = backStackEntry.toRoute<Detail>()
+        composable(
+            route = "detail/{albumId}",
+            arguments = listOf(navArgument("albumId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val albumId = backStackEntry.arguments?.getString("albumId") ?: return@composable
             DetailScreen(
-                albumId = detail.albumId,
+                albumId = albumId,
                 onBack = { navController.popBackStack() }
             )
         }
