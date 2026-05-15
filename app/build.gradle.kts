@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
 }
 
 android {
@@ -65,7 +65,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
 
 // Navigation Compose
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.navigation:navigation-compose:2.8.9")
 
 // Serialization (para pasar objetos entre pantallas)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
