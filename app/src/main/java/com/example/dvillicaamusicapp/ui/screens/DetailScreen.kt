@@ -16,13 +16,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.dvillicaamusicapp.ImageLoaderProvider
 import com.example.dvillicaamusicapp.data.Album
 import com.example.dvillicaamusicapp.data.RetrofitInstance
 import com.example.dvillicaamusicapp.ui.components.MiniPlayer
@@ -86,72 +88,73 @@ fun DetailScreen(
 
 @Composable
 private fun DetailHeader(album: Album, onBack: () -> Unit) {
-    Box(
+    val context = LocalContext.current
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(320.dp)
+            .padding(16.dp)
     ) {
-        AsyncImage(
-            model = album.image,
-            contentDescription = album.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-        Box(
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0x66000000),
-                            Color(0xAA7B5EA7),
-                            Color(0xDDF5F0FA)
-                        )
-                    )
+                .fillMaxWidth()
+                .aspectRatio(1f),
+            shape = RoundedCornerShape(20.dp),
+            elevation = CardDefaults.cardElevation(6.dp)
+        ) {
+            Box(Modifier.fillMaxSize()) {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(album.image)
+                        .crossfade(true)
+                        .build(),
+                    imageLoader = ImageLoaderProvider.get(context),
+                    contentDescription = album.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
-        )
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .statusBarsPadding()
-                .padding(8.dp)
-                .align(Alignment.TopStart)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
-        }
-        IconButton(
-            onClick = { },
-            modifier = Modifier
-                .statusBarsPadding()
-                .padding(8.dp)
-                .align(Alignment.TopEnd)
-        ) {
-            Icon(Icons.Default.Favorite, contentDescription = "Favorite", tint = Color.White)
-        }
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(20.dp)
-        ) {
-            Text(album.title, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Text(album.artist, color = Color.White.copy(alpha = 0.8f), fontSize = 16.sp)
-            Spacer(Modifier.height(16.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                IconButton(
-                    onClick = { },
+                Row(
                     modifier = Modifier
-                        .size(48.dp)
-                        .background(Color(0xFF7B5EA7), CircleShape)
+                        .fillMaxWidth()
+                        .statusBarsPadding()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = Color.White)
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                    }
+                    IconButton(onClick = { }) {
+                        Icon(Icons.Default.Favorite, contentDescription = "Favorite", tint = Color.White)
+                    }
                 }
-                IconButton(
-                    onClick = { },
+                Column(
                     modifier = Modifier
-                        .size(48.dp)
-                        .background(Color(0xFF5C3D8F), CircleShape)
+                        .align(Alignment.BottomStart)
+                        .fillMaxWidth()
+                        .background(Color.Black.copy(alpha = 0.4f))
+                        .padding(16.dp)
                 ) {
-                    Icon(Icons.Default.PlayArrow, contentDescription = "Shuffle", tint = Color.White)
+                    Text(album.title, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                    Text(album.artist, color = Color.White.copy(alpha = 0.8f), fontSize = 16.sp)
+                    Spacer(Modifier.height(12.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        IconButton(
+                            onClick = { },
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(Color(0xFF7B5EA7), CircleShape)
+                        ) {
+                            Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = Color.White)
+                        }
+                        IconButton(
+                            onClick = { },
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(Color(0xFF5C3D8F), CircleShape)
+                        ) {
+                            Icon(Icons.Default.PlayArrow, contentDescription = "Shuffle", tint = Color.White)
+                        }
+                    }
                 }
             }
         }
@@ -195,6 +198,8 @@ private fun ArtistChip(artist: String) {
 
 @Composable
 private fun TrackItem(track: String, album: Album) {
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -210,7 +215,11 @@ private fun TrackItem(track: String, album: Album) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = album.image,
+                model = ImageRequest.Builder(context)
+                    .data(album.image)
+                    .crossfade(true)
+                    .build(),
+                imageLoader = ImageLoaderProvider.get(context),
                 contentDescription = track,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

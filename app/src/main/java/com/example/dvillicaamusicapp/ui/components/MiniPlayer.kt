@@ -15,10 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.dvillicaamusicapp.ImageLoaderProvider
 import com.example.dvillicaamusicapp.data.Album
 
 @Composable
@@ -27,6 +30,7 @@ fun MiniPlayer(
     modifier: Modifier = Modifier
 ) {
     if (album == null) return
+    val context = LocalContext.current
 
     Box(
         modifier = modifier
@@ -42,7 +46,11 @@ fun MiniPlayer(
             modifier = Modifier.fillMaxWidth()
         ) {
             AsyncImage(
-                model = album.image,
+                model = ImageRequest.Builder(context)
+                    .data(album.image)
+                    .crossfade(true)
+                    .build(),
+                imageLoader = ImageLoaderProvider.get(context),
                 contentDescription = album.title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

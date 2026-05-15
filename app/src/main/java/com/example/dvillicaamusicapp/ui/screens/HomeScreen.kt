@@ -21,10 +21,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.dvillicaamusicapp.ImageLoaderProvider
 import com.example.dvillicaamusicapp.data.Album
 import com.example.dvillicaamusicapp.data.RetrofitInstance
 import com.example.dvillicaamusicapp.ui.components.MiniPlayer
@@ -62,9 +65,7 @@ fun HomeScreen(
     }
 
     Box(Modifier.fillMaxSize().background(Color(0xFFF5F0FA))) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
             item { HomeHeader() }
             item { AlbumsSection(albums, onAlbumClick) }
             item { RecentlyPlayedHeader() }
@@ -85,30 +86,42 @@ private fun HomeHeader() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFFB39DDB), Color(0xFFE1BEE7), Color(0xFFF5F0FA))
-                )
-            )
-            .padding(horizontal = 20.dp, vertical = 24.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        Row(
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+            shape = RoundedCornerShape(20.dp),
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            Column {
-                Icon(Icons.Default.Menu, contentDescription = null, tint = Color.White)
-                Spacer(Modifier.height(12.dp))
-                Text("Good Morning!", color = Color.White, fontSize = 14.sp)
-                Text(
-                    "Deborah Villicaña",
-                    color = Color.White,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold
-                )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(Color(0xFF9C6ADE), Color(0xFFB98DE0), Color(0xFFCDA4F0))
+                        )
+                    )
+                    .padding(20.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Column {
+                        Icon(Icons.Default.Menu, contentDescription = null, tint = Color.White)
+                        Spacer(Modifier.height(12.dp))
+                        Text("Good Morning!", color = Color.White.copy(alpha = 0.9f), fontSize = 14.sp)
+                        Text(
+                            "Deborah Villicaña",
+                            color = Color.White,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Icon(Icons.Default.Search, contentDescription = null, tint = Color.White)
+                }
             }
-            Icon(Icons.Default.Search, contentDescription = null, tint = Color.White)
         }
     }
 }
@@ -138,48 +151,69 @@ private fun AlbumsSection(albums: List<Album>, onAlbumClick: (String) -> Unit) {
 
 @Composable
 private fun AlbumCard(album: Album, onAlbumClick: (String) -> Unit) {
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .width(200.dp)
-            .height(220.dp)
+            .height(230.dp)
             .clickable { onAlbumClick(album.id) },
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF2D1B4E))
     ) {
-        Box(Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
             AsyncImage(
-                model = album.image,
+                model = ImageRequest.Builder(context)
+                    .data(album.image)
+                    .crossfade(true)
+                    .build(),
+                imageLoader = ImageLoaderProvider.get(context),
                 contentDescription = album.title,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             )
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
-                            startY = 100f
+                    .fillMaxWidth()
+                    .background(Color(0xFF2D1B4E))
+                    .padding(start = 12.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            album.title,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            maxLines = 1
                         )
-                    )
-            )
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(12.dp)
-            ) {
-                Text(album.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1)
-                Text(album.artist, color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-            }
-            IconButton(
-                onClick = { },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(8.dp)
-                    .size(36.dp)
-                    .background(Color(0xFF7B5EA7), CircleShape)
-            ) {
-                Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = Color.White, modifier = Modifier.size(20.dp))
+                        Text(
+                            album.artist,
+                            color = Color.White.copy(alpha = 0.7f),
+                            fontSize = 12.sp,
+                            maxLines = 1
+                        )
+                    }
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(Color(0xFF7B5EA7), CircleShape)
+                    ) {
+                        Icon(
+                            Icons.Default.PlayArrow,
+                            contentDescription = "Play",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
             }
         }
     }
@@ -201,6 +235,8 @@ private fun RecentlyPlayedHeader() {
 
 @Composable
 private fun RecentlyPlayedItem(album: Album, onAlbumClick: (String) -> Unit) {
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -217,7 +253,11 @@ private fun RecentlyPlayedItem(album: Album, onAlbumClick: (String) -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = album.image,
+                model = ImageRequest.Builder(context)
+                    .data(album.image)
+                    .crossfade(true)
+                    .build(),
+                imageLoader = ImageLoaderProvider.get(context),
                 contentDescription = album.title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
